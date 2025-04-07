@@ -233,12 +233,12 @@ const AuthCrimeCharts = () => {
           {
             data: typeData.counts,
             backgroundColor: [
-              "skyblue", // Red
-              "darkblue", // Orange
-              "yellow", // Yellow
-              "lightgreen", // Green
-              "pink", // Blue
-              "#9333ea", // Purple
+              "skyblue",
+              "darkblue",
+              "yellow",
+              "lightgreen",
+              "pink",
+              "#9333ea",
             ],
             borderWidth: 2,
             borderColor: "#f3f4f6",
