@@ -361,26 +361,7 @@ export default function Dashboard() {
                   ))}
                 </div>
 
-                {/* 
-                <label className="flex items-center gap-2 ml-auto">
-                  <FiCheckSquare className="w-5 h-5 text-gray-600" />
-                  <input
-                    type="checkbox"
-                    checked={filters.verifiedOnly}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        verifiedOnly: e.target.checked,
-                      }))
-                    }
-                    className="w-4 h-4"
-                  />
-                  <span className="text-gray-700">Verified reports only</span>
-                </label>
-              </div>
-            </motion.section> */}
-
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-2 cursor-pointer ml-auto">
                   <FiCheckSquare className="w-5 h-5 text-gray-600" />
                   <input
                     type="checkbox"
@@ -394,7 +375,7 @@ export default function Dashboard() {
                     className="w-4 h-4 accent-blue-600"
                   />
                   <span className="text-gray-700 text-sm sm:text-base">
-                    Verified only
+                    Verified reports only
                   </span>
                 </label>
               </div>

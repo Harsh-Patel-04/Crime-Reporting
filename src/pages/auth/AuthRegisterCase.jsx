@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   FiAlertCircle,
@@ -24,6 +24,7 @@ export default function RegisterCase() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const recognition = useRef(null);
   const [coordinates, setCoordinates] = useState({
     lat: null,
     lng: null,
@@ -91,12 +92,12 @@ export default function RegisterCase() {
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
       if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = "en-US";
+        recognition.current = new SpeechRecognition();
+        recognition.current.continuous = true;
+        recognition.current.interimResults = true;
+        recognition.current.lang = "en-US";
 
-        recognition.onresult = (event) => {
+        recognition.current.onresult = (event) => {
           const transcript = Array.from(event.results)
             .map((result) => result[0])
             .map((result) => result.transcript)
@@ -109,29 +110,44 @@ export default function RegisterCase() {
             setInterimTranscript(transcript);
           }
         };
+        recognition.current.onresult = (event) => {
+          console.log("Speech recognition event:", event); // Debug log
+          const transcript = Array.from(event.results)
+            .map((result) => result[0])
+            .map((result) => result.transcript)
+            .join("");
 
-        recognition.onerror = (event) => {
+          if (event.results[0].isFinal) {
+            console.log("Final transcript:", transcript); // Debug log
+            setDescription((prev) =>
+              prev ? prev + " " + transcript : transcript
+            );
+            setInterimTranscript("");
+          } else {
+            console.log("Interim transcript:", transcript); // Debug log
+            setInterimTranscript(transcript);
+          }
+        };
+
+        recognition.current.onerror = (event) => {
           setSpeechError("Error occurred in recognition: " + event.error);
           setIsListening(false);
         };
 
-        recognition.onstart = () => {
+        recognition.current.onstart = () => {
           setIsListening(true);
           setSpeechError(null);
         };
 
-        recognition.onend = () => {
+        recognition.current.onend = () => {
           setIsListening(false);
-        };
-
-        return () => {
-          recognition.stop();
         };
       } else {
         setSpeechError("Speech recognition not supported in this browser");
       }
     }
   }, []);
+
   useEffect(() => {
     if (mapLoaded && coordinates.lat && coordinates.lng) {
       const mapInstance = new window.google.maps.Map(
@@ -540,7 +556,7 @@ export default function RegisterCase() {
                   )}
                 </div>
 
-                <div className="md:col-span-2">
+                {/* <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Description <span className="text-red-500">*</span>
                   </label>
@@ -560,10 +576,10 @@ export default function RegisterCase() {
                     <button
                       type="button"
                       onClick={() => {
-                        if (!isListening) {
-                          const recognition = new (window.SpeechRecognition ||
-                            window.webkitSpeechRecognition)();
-                          recognition.start();
+                        if (isListening) {
+                          recognition.current?.stop();
+                        } else {
+                          recognition.current?.start();
                         }
                       }}
                       className={`absolute right-3 top-4 p-2 rounded-full ${
@@ -596,6 +612,69 @@ export default function RegisterCase() {
                       </svg>
                     </button>
                   </div>
+                  {speechError && (
+                    <p className="text-red-500 text-sm mt-2">{speechError}</p>
+                  )}
+                </div> */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <FiFileText className="absolute left-3 top-4 text-gray-400" />
+                    <textarea
+                      placeholder="Provide detailed description of the incident"
+                      className="w-full pl-10 pr-16 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      rows="4"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (isListening) {
+                          recognition.current?.stop();
+                        } else {
+                          recognition.current?.start();
+                        }
+                      }}
+                      className={`absolute right-3 top-4 p-2 rounded-full transition-colors ${
+                        isListening
+                          ? "text-red-600 animate-pulse"
+                          : "text-gray-600 hover:text-blue-600"
+                      }`}
+                      title={
+                        isListening ? "Stop recording" : "Start voice input"
+                      }
+                      disabled={
+                        !(
+                          "SpeechRecognition" in window ||
+                          "webkitSpeechRecognition" in window
+                        )
+                      }
+                    >
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  {/* Show interim transcript separately */}
+                  {isListening && interimTranscript && (
+                    <p className="mt-2 text-sm text-gray-500">
+                      Listening: {interimTranscript}
+                    </p>
+                  )}
                   {speechError && (
                     <p className="text-red-500 text-sm mt-2">{speechError}</p>
                   )}
