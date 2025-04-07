@@ -25,8 +25,8 @@ export default function RegisterCase() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [coordinates, setCoordinates] = useState({
-    lat: null,
-    lng: null,
+    lat: 22.2587,
+    lng: 71.1924,
   });
   const [address, setAddress] = useState("");
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -61,6 +61,10 @@ export default function RegisterCase() {
     script.async = true;
     script.defer = true;
     script.onload = () => setMapLoaded(true);
+    script.onerror = () => {
+      console.error("Failed to load Google Maps script");
+      setMapLoaded(false);
+    };
     document.head.appendChild(script);
 
     if (navigator.geolocation) {
