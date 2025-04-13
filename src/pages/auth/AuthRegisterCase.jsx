@@ -16,7 +16,7 @@ import {
   FiEye,
   FiEyeOff,
 } from "react-icons/fi";
-import Navbar from "../../components/CitizenNavbar";
+import Navbar from "../../components/AuthNavbar";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 
