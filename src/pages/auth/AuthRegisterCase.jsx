@@ -20,7 +20,7 @@ const formVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export default function RegisterCase() {
+export default function AuthRegisterCase() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,6 +35,7 @@ export default function RegisterCase() {
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false);
   const [crimeType, setCrimeType] = useState("");
+  const [severity, setSeverity] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState(null);
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -267,7 +268,7 @@ export default function RegisterCase() {
             latitude: formData.coordinates.lat,
             longitude: formData.coordinates.lng,
             description: formData.description,
-            severity: "low",
+            severity: formData.severity.toLowerCase(),
             status: "pending",
             reported_at: formData.dateTime,
             updated_at: new Date().toISOString(),
@@ -294,7 +295,8 @@ export default function RegisterCase() {
       !dateTime ||
       !description ||
       !coordinates.lat ||
-      !coordinates.lng
+      !coordinates.lng ||
+      !severity
     ) {
       setIsSubmitting(false);
       setSubmissionStatus({
@@ -308,6 +310,7 @@ export default function RegisterCase() {
     const formData = {
       isAnonymous,
       crimeType,
+      severity,
       title,
       dateTime,
       coordinates,
@@ -327,6 +330,7 @@ export default function RegisterCase() {
 
         setTimeout(() => {
           setCrimeType("");
+          setSeverity("");
           setDateTime("");
           setDescription("");
           setCaseNumber("");
@@ -490,7 +494,39 @@ export default function RegisterCase() {
                     </div>
                   </div>
                 </div>
-
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Severity <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      className="w-full pl-4 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white"
+                      value={severity}
+                      onChange={(e) => setSeverity(e.target.value)}
+                      required
+                    >
+                      <option value="">Select severity</option>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Date & Time <span className="text-red-500">*</span>
